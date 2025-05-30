@@ -1,49 +1,63 @@
 const client = require('./client.js');
 
-const checkUserExists = async (user_id) => {
-  const { rows } = await client.query(
-    `SELECT id FROM users WHERE id = $1;`,
-    [user_id]
-  );
-  return rows.length > 0;
-};
-
-const checkMovieExists = async (movie_id) => {
-  const { rows } = await client.query(
-    `SELECT id FROM movies WHERE id = $1;`,
-    [movie_id]
-  );
-  return rows.length > 0;
-};
-
-const createReview = async ({ user_id, movie_id, rating, comment }) => {
-  if (!user_id) throw new Error('user_id is required');
-  if (!movie_id) throw new Error('movie_id is required');
-  if (rating === undefined || rating === null) throw new Error('rating is required');
-  if (rating < 1 || rating > 5) throw new Error('rating must be between 1 and 5');
-
-  const userExists = await checkUserExists(user_id);
-  if (!userExists) throw new Error(`User with id ${user_id} does not exist`);
-
-  const movieExists = await checkMovieExists(movie_id);
-  if (!movieExists) throw new Error(`Movie with id ${movie_id} does not exist`);
-
+// CREATE a review - accepts an object param
+const createReview = async ({ userId, rating, comment = '', movieId }) => {
+  if (!userId || !rating || !movieId) {
+    throw new Error('userId, rating, and movieId are required');
+  }
   try {
-    const { rows } = await client.query(
-      `
-      INSERT INTO reviews (user_id, movie_id, rating, comment)
+    const { rows } = await client.query(`
+      INSERT INTO reviews (user_id, rating, comment, movie_id)
       VALUES ($1, $2, $3, $4)
       RETURNING *;
-      `,
-      [user_id, movie_id, rating, comment || null]
-    );
+    `, [userId, rating, comment, movieId]);
+
+    console.log('Inserted review:', rows[0]);
+    
     return rows[0];
-  } catch (err) {
-    console.error('Error creating review:', err);
-    throw err;
+  } catch (error) {
+    throw new Error('Error creating review: ' + error.message);
+  }
+};
+
+// FETCH all reviews
+const getAllReviews = async () => {
+  try {
+    const { rows } = await client.query(`SELECT * FROM reviews;`);
+    return rows;
+  } catch (error) {
+    throw new Error('Error fetching reviews: ' + error.message);
+  }
+};
+
+// FETCH a review by ID
+const getReviewById = async (id) => {
+  if (!id) throw new Error('Review ID is required');
+  try {
+    const { rows } = await client.query(`SELECT * FROM reviews WHERE id = $1;`, [id]);
+    return rows[0];
+  } catch (error) {
+    throw new Error('Error fetching review by ID: ' + error.message);
+  }
+};
+
+// DELETE a review by ID
+const deleteReview = async (id) => {
+  if (!id) throw new Error('Review ID is required');
+  try {
+    const { rows } = await client.query(`
+      DELETE FROM reviews WHERE id = $1
+      RETURNING *;
+    `, [id]);
+    return rows[0];
+  } catch (error) {
+    throw new Error('Error deleting review: ' + error.message);
   }
 };
 
 module.exports = {
   createReview,
+  getAllReviews,
+  getReviewById,
+  deleteReview,
 };
