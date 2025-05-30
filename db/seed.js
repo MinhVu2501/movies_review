@@ -79,7 +79,7 @@ const syncAndSeed = async () => {
     console.log('CREATING USERS');
     const alice = await createUser('alice', 'superSecretPassword123');
     const bob = await createUser('bob', 'hunter2');
-    const charlie = await createUser('charlie', 'charliePass456'); // New user added
+    const charlie = await createUser('charlie', 'charliePass456'); 
     console.log('USERS CREATED');
 
     console.log('CREATING MOVIES');
@@ -120,7 +120,7 @@ const syncAndSeed = async () => {
       movieId: godfather.id,
       rating: 3,
       comment: 'Pretty good!',
-    }); // New review by Charlie
+    }); 
 
     console.log('REVIEWS CREATED');
 

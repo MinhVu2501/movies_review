@@ -1,6 +1,6 @@
 const client = require('./client.js');
 
-// CREATE a review - accepts an object param
+
 const createReview = async ({ userId, rating, comment = '', movieId }) => {
   if (!userId || !rating || !movieId) {
     throw new Error('userId, rating, and movieId are required');
@@ -13,14 +13,14 @@ const createReview = async ({ userId, rating, comment = '', movieId }) => {
     `, [userId, rating, comment, movieId]);
 
     console.log('Inserted review:', rows[0]);
-    
+
     return rows[0];
   } catch (error) {
     throw new Error('Error creating review: ' + error.message);
   }
 };
 
-// FETCH all reviews
+
 const getAllReviews = async () => {
   try {
     const { rows } = await client.query(`SELECT * FROM reviews;`);
@@ -30,7 +30,7 @@ const getAllReviews = async () => {
   }
 };
 
-// FETCH a review by ID
+
 const getReviewById = async (id) => {
   if (!id) throw new Error('Review ID is required');
   try {
@@ -41,7 +41,7 @@ const getReviewById = async (id) => {
   }
 };
 
-// DELETE a review by ID
+
 const deleteReview = async (id) => {
   if (!id) throw new Error('Review ID is required');
   try {

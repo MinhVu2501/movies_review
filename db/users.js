@@ -1,7 +1,7 @@
 const client = require('./client.js');
 const bcrypt = require('bcrypt');
 
-// Create a new user
+
 const createUser = async (username, password) => {
   if (!username || !password) {
     throw new Error('Username and password are required');
