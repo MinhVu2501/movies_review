@@ -1,5 +1,7 @@
 const client = require('./client.js');
-
+const { createUser } = require('./users.js');
+const { createMovie } = require('./movies.js');
+const { createReview } = require('./reviews.js');
 const dropTables = async() => {
   try {
     await client.query(`
@@ -17,8 +19,9 @@ const createTables = async() => {
     await client.query(`
       CREATE TABLE users (
         id SERIAL PRIMARY KEY,
-        username VARCHAR(255) UNIQUE NOT NULL,
-        password_hash TEXT NOT NULL
+        username VARCHAR(30) UNIQUE NOT NULL,
+        password VARCHAR(60) NOT NULL,
+        name VARCHAR(30)
         );
 
       CREATE TABLE movies (
@@ -53,10 +56,37 @@ const syncAndSeed = async() => {
   await dropTables();
   console.log(`TABLES DROPPED`);
 
-  console.log(`ADDING TABLES`);
+  console.log(`CREATING TABLES`);
   await createTables();
-  console.log(`TABLES ADDED`);
+  console.log(`TABLES CREATED`);
+  
+  console.log('CREATING USERS');
+  await createUser('alice', 'superSecretPassword123');
 
+  console.log('USERS CREATED');
+  
+  console.log('CREATING MOVIES');
+  
+  await createMovie({
+    title: 'Inception',
+    genre: 'Sci-Fi',
+    year: 2010,
+    poster_url: 'http://example.com/inception.jpg',
+    summary: 'A mind-bending thriller...'
+    });
+    
+  console.log('MOVIES CREATED');
+
+  console.log('CREATING REVIEW');
+
+  await createReview({
+    user_id: 1,
+    movie_id: 1,
+    rating: 4,
+    comment: 'Really enjoyed this movie!'
+  });
+
+  console.log('REVIEWS CREATED');
   await client.end();
   console.log(`DISCONNECTED TO DB`);
 }
